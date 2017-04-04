@@ -1,0 +1,9 @@
+/**index.wxss**/
+.title{padding: 0 50rpx 0 30rpx}
+.title .year{width:60%; display:inline-block; text-align:left; font-size:40rpx;}
+.title .neweventbutton{width:40%; display:inline-block; text-align:right; color:#0000FF; font-size:60rpx; font-weight:bold;}
+.calendar{width:100%;  height: 215px;}
+.nodata {padding:100rpx 20rpx 150rpx 20rpx; text-align: center;line-height: 48rpx;font-size: 32rpx;color: #999;}
+.event{width:100%; font-size:30rpx}
+.event .date{ width:45%; display:inline-block;text-align: left; overflow:hidden;}
+.event .name{width: 55%; display: inline-block; text-align: right; overflow:hidden;}

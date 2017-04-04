@@ -1,0 +1,8 @@
+@import "./assets/weui.wxss";
+
+page {background-color: #F8F8F8; padding: 20rpx 0px;overflow-x: hidden;}
+.container {height: 100%; } 
+.buttons {margin-top: 40rpx; padding: 20rpx 30rpx;}
+.buttons button{margin: 0 0 20rpx 0;}
+
+

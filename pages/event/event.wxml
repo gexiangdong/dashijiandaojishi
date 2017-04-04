@@ -1,0 +1,21 @@
+<!--index.wxml-->
+<view class="container">
+    <view class="event">
+        <view class="eventdate" wx:if="{{showDate}}">{{ event.date }}</view>
+        <view class="days"><text class="num">{{ event.days }}</text><text class="unit">天</text></view>
+        <view class="wisdom"><text class="content">{{ event.wisdom }}</text>
+            <text wx:if="{{event.author}}" class="author">--- {{ event.author }}　</text>
+        </view>
+    </view>
+    <view class="notice">温馨提示：{{hint}}</view>
+    <view class="iconlinks" wx:if="{{editable || deleteable}}">
+        <view bindtap="editEvent" class="iconlink editicon" wx:if="{{editable}}">修改</view>
+        <view bindtap="deleteEvent" class="iconlink deleteicon" wx:if="{{deleteable}}">删除</view>
+    </view>
+    <view class="buttons">
+        <button type="default" size="default" 
+        bindtap="watchThisEvent" wx:if="{{watchable}}" hover-class="other-button-hover"> 关注此大事件 </button>
+        <button type="default" size="default" 
+        bindtap="gotoMyEvents" hover-class="other-button-hover"> 跳转到我的大事件 </button>
+    </view>
+</view>

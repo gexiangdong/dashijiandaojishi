@@ -1,0 +1,4 @@
+.buttons {margin: 50rpx 0rpx 20rpx 0rpx;}
+.placeholder{color:#999; text-align:left; }
+.weui-input{width:100%;}
+.weui-cell_input picker{width:100%;}

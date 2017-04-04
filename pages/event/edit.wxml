@@ -1,0 +1,32 @@
+<!--pages/event/edit.wxml-->
+  <form class="form">
+
+    <view class="page-section">
+      <view class="weui-cells__title">事件名称</view>
+      <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell weui-cell_input">
+          <input bindchange="bindNameChange" class="weui-input" auto-focus placeholder="如：高考、XX项目上线、春节等" value="{{event.name}}" maxlength="30" />
+        </view>
+      </view>
+    </view>
+
+  <view class="page-section">
+      <view class="weui-cells__title">发生日期</view>
+      <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell weui-cell_input">
+            <picker mode="date" value="{{event.date}}" start="{{startDate}}" end="{{endDate}}" bindchange="bindDateChange">
+              <view class="weui-input placeholder" wx:if="{{event.date == null}}">请选择事件发生日期</view> <view class="weui-input" wx:else>{{event.date}}</view>
+            </picker>
+          </view>
+      </view>
+  </view>
+ </form>
+
+    <view class="buttons">
+        <button type="primary" size="default" 
+        bindtap="saveEvent" hover-class="other-button-hover"> 保 存 </button>
+        <button type="default" size="default" 
+        bindtap="gotoMyEvents" hover-class="other-button-hover"> 取 消 </button>
+    </view>
+
+
