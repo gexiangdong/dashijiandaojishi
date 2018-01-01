@@ -16,7 +16,9 @@ Page({
       watchable: false,
       deleteable: false,
       showDate: false,
-      hint: '可把此页转发到群对话内'
+      shareit: true,
+      backButtonType: "default",
+      hint: '点右上角可把此页转发到群对话内'
   },
   onLoad:function(options){
     // 页面初始化 options为页面跳转所带来的参数
@@ -66,16 +68,35 @@ Page({
       }
     }
     if(found){
+      var canShare = false
+      try{
+        var res = wx.getSystemInfoSync()
+        var sdkversion = res.SDKVersion
+        if (sdkversion) {
+          sdkversion = sdkversion.substring(0, sdkversion.lastIndexOf('.'))
+          console.log("SDKVersion=" + sdkversion)
+          if(parseFloat(sdkversion) >= 1.2){
+            canShare = true
+          }
+        }
+      }catch(e){
+        console.log("ERROR while get SDKVersion: " + e)
+      }
+
       this.setData({
         editable: true,
         deleteable: true,
-        watchable: false
+        watchable: false,
+        shareit: canShare,
+        backButtonType: canShare ? "default" : "primary"
       })
     }else{
       this.setData({
         editable: false,
         deleteable: false,
-        watchable: true
+        watchable: true,
+        shareit: false,
+        backButtonType: "default"
       })
     }
   },

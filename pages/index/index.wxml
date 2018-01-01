@@ -1,19 +1,21 @@
 <!--index.wxml-->
 <view class="container">
   <view class="title">
-    <view class="year">{{calendar.year}}年</view>
-    <view class="neweventbutton" bindtap="addEvent">+</view>
+    <view class="year" style="display:none">{{calendar.year}}年</view>
+    <view style="display:none" class="neweventbutton" bindtap="addEvent">+</view>
   </view>
-  <canvas catchtouchstart="touchStart" catchtouchend="touchEnd" catchtouchmove="touchMove" catchtouchcancel="touchCancel"  canvas-id="calendar" class="calendar" style="height:{{canvasHeight}}px" />
   <view wx:if="{{eventList.length <= 0}}">
-      <view>
-        <view class="nodata">
-        <text>你日历上还没有大事件。 \r\n去创建一个吧。</text></view>
-      </view>
+    <view>
+      <view class="nodata">
+      <text>你未设置大事件。 \r\n去创建一个吧。</text></view>
+    </view>
   </view>
   <view class="weui-panel">
-    <block wx:for-items="{{ eventList }}" wx:key="{{item.date}}">
-      <navigator url="/pages/event/event?{{item.urlParams}}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+    <block wx:for-items="{{ eventList }}" wx:for-index="index" wx:key="{{item.date}}">
+      <view class="weui-media-box weui-media-box_appmsg delrowbutton" style="{{ index == showDelRow ? '' : 'display:none' }};width:{{delRowButtonWidth - 20}}rpx;" catchtap="delRow" id="del_{{index}}">
+        <view class="btn">删除</view>
+      </view>
+      <navigator id="event_{{index}}" bind:touchstart="rowTouchStart" bind:touchend="rowTouchEnd" bind:touchmove="rowTouchMove" bind:touchcancel="rowTouchCancel" url="/pages/event/event?{{item.urlParams}}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active" style="margin-right:{{index == showDelRow ? delRowButtonWidth : 0 }}rpx;">
         <view class="event">
           <view class="date">{{item.date}}</view> 
           <view class="name">{{item.name}}</view>
@@ -23,7 +25,6 @@
   </view>
 
   <view class="buttons">
-        <button type="default" size="default" 
-        bindtap="addEvent" hover-class="other-button-hover"> + 新增大事件 </button>
+    <button type="primary" size="default" bindtap="addEvent" hover-class="other-button-hover"> + 新增大事件 </button>
   </view>
 </view>

@@ -56,15 +56,65 @@ function updateMyEvents(newEvents){
     getApp().globalData.myEvents = newEvents
     wx.setStorageSync('myevents', newEvents)
 }
+
 function getMyEvents(){
     var app = getApp()
+    var now = new Date().getTime()
     if(app.globalData && app.globalData.myEvents){
       return app.globalData.myEvents
     }
     //调用API从本地缓存中获取数据
     var myEvents = wx.getStorageSync('myevents') || []
+    if(myEvents.length == 0){
+      //我的事件为空
+      var newUser = wx.getStorageSync('newuser') || true
+      if(newUser){
+        //增加一些样例事件
+        var d = new Date()
+        if(d.getDay() < 6){
+          console.log('day=' + d.getDay())
+          var sample0 = {
+            name: '周末',
+            d: new Date(d.getFullYear(), d.getMonth(), d.getDate() + (6 - d.getDay())).getTime(),
+            id: 'sample-zm-' + d.getTime
+          }
+          myEvents.push(sample0)
+        }
+        var sample1 = {
+          name: '情人节',
+          d: new Date(2018, 1, 14).getTime(),
+          id: 'sample-gqj-1'
+        }
+        myEvents.push(sample1)
+
+        var sample2 = {
+          name: '春节放假',
+          d: new Date(2018, 1, 15).getTime(),
+          id: 'sample-cj-2'
+        }
+        myEvents.push(sample2)
+
+        var sample3 = {
+          name: '五一劳动节',
+          d: new Date(2018, 4, 1).getTime(),
+          id: 'sample-ldj-3'
+        }
+        myEvents.push(sample3)
+
+        var sample4 = {
+          name: '2018年高考',
+          d: new Date(2018, 5, 7).getTime(),
+          id: 'sample-gk-4'
+        }
+        myEvents.push(sample4)
+
+      }
+      wx.setStorage({
+        key: 'newuser',
+        data: false,
+      })
+    }
     var newEvents = []
-    var now = new Date().getTime()
     for(var i=0; i<myEvents.length; i++){
       var event = myEvents[i]
       if(event.d > now){

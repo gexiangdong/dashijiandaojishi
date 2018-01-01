@@ -9,27 +9,69 @@ Page({
               month:0
             },
     canvasHeight: 215,
+    showDelRow: -2,
+    delRowButtonWidth: 0,
     touchTimer: {handler:null, lastX:null, lastY: null, startX: null, startY: null}
   },
-  touchStart: function(e){
-    if(e.changedTouches.length > 0){
+  delRow: function(e){
+    var targetId = e.currentTarget.id
+    var rowIndex = parseInt(targetId.split("_")[1])
+    var event = this.data.eventList[rowIndex]
+    console.log(rowIndex + ' ' + event.name)
+    let that = this
+    wx.showModal({
+      title: '',
+      content: '确定要删除' + event.name + '吗？',
+      success: function (res) {
+        if (res.confirm) {
+          console.log("will delete " + event.id)
+          util.deleteEventById(event.id)
+          that.setData({showDelRow: -1})
+          that.initEventList()
+        } else if (res.cancel) {
+          //console.log('用户点击取消')
+        }
+      }
+    })
+  },
+  rowTouchStart: function (e) {
+    // var targetId = e.currentTarget.id
+    // var rowIndex = parseInt(targetId.split("_")[1])
+    this.setData({ showDelRow: -1, delRowButtonWidth: 0 })
+
+    if (e.changedTouches.length > 0) {
       var x = e.changedTouches[0].clientX
       var y = e.changedTouches[0].clientY
       this.setData({
-        touchTimer: {handler: null, startX: x, startY: y, lastX: x, lastY: y }
+        touchTimer: { handler: null, startX: x, startY: y, lastX: x, lastY: y }
       })
     }
   },
-  touchMove: function(e){
+  rowTouchMove: function(e){
+    if (!e.changedTouches[0]){
+      // console.log("event changedTouches #0 is undefine")
+      return
+    }
     var x = e.changedTouches[0].clientX
     var y = e.changedTouches[0].clientY
-    if(this.data.touchTimer.startX == null && e.changedTouches.length > 0){
+    if(this.data.touchTimer.startX == null){
       this.setData({
         touchTimer: {handler: null, startX: x, startY: y, lastX: x, lastY: y }
       })
-    }else if (Math.abs( y - this.data.touchTimer.lastY) > 5){
-      var paddingY = y - this.data.touchTimer.startY
-      this.drawCalendar(0, paddingY)
+    } else if (Math.abs(this.data.touchTimer.startX - x) > 40){
+      var targetId = e.currentTarget.id
+      var rowIndex = parseInt(targetId.split("_")[1])
+      // var cx = this.data.touchTimer.lastX - x
+      // var w = this.data.delRowButtonWidth + cx
+      var w = (this.data.touchTimer.startX - x)/2;
+      console.log('touchmove ' + w + ' on row #' + rowIndex)
+      if(w <= 0){
+        w = 0
+        rowIndex = -1
+      }else if(w > 120){
+        w = 120
+      }
+      this.setData({ showDelRow: rowIndex, delRowButtonWidth: w })
       this.setData({
         touchTimer: {
             handler: null, 
@@ -40,132 +82,18 @@ Page({
       })
     }
   },
-  touchEnd: function(e){
-    if(e.changedTouches.length > 0){
-      var x = e.changedTouches[0].clientX
-      var y = e.changedTouches[0].clientY
-      if(this.data.touchTimer.startX != null){
-        var disX = this.data.touchTimer.startX - x
-        var disY = this.data.touchTimer.startY - y
-        console.log('touchend: ' + disX + ' ' + disY)
-        if(Math.abs(disY) >= 90){
-          if(disY > 0){
-            var m = this.data.calendar.month + 6
-            var y = this.data.calendar.year
-            if( m >= 12){
-              y ++
-              m = m % 12
-            }
-          }else{
-            var m = this.data.calendar.month - 6
-            var y = this.data.calendar.year
-            if(m < 0){
-              m += 12
-              y --
-              m = m % 12
-            }
-          }
-          this.setData({calendar:{year: y, month: m}})
-          console.log("drawCalendar with " + y + "-" + m)
-        }
-      }
-    }
-    this.touchCancel()
+  rowTouchEnd: function(e){
+    this.rowTouchCancel()
   },
-  touchCancel: function(e){
+  rowTouchCancel: function(e){
+    if (this.data.delRowButtonWidth < 80){
+      this.setData({showDelRow: -1, delRowButtonWidth: 0})
+    }else{
+      this.setData({delRowButtonWidth: 120 })
+    }
     this.setData({
       touchTimer: {handler: null, startX: null, startY: null, lastX: null, lastY: null }
     })
-    this.drawCalendar(0, 0)
-  },
-  drawCalendar: function(paddingX, paddingY){
-    var year = this.data.calendar.year, month=this.data.calendar.month
-    var d = new Date(year, month, 1)
-    var m = d.getMonth() + 6
-    var endDate = (m >= 12 ? new Date(year + 1, m % 12, 1) : new Date(year, m, 1))
-    console.log('drawCalendar ' + year + ', ' + month + ' end date is ' + endDate)
-    if(paddingX == null) {paddingX = 0}
-    if(paddingY == null) {paddingY = 0}
-    const ctx = wx.createCanvasContext('calendar')
-    if(ctx.setTextAlign){
-      ctx.setTextAlign('center')
-    }
-    ctx.setFontSize(8)
-    //ctx.arc(20, 20, 10, 0, 2 * Math.PI)
-    //ctx.setFillStyle('#FF0000')
-    //ctx.fill()
-    
-    try {
-      var res = wx.getSystemInfoSync()
-      var r = res.windowWidth / 375
-      this.setData({canvasHeight: Math.ceil(215 * r)})
-      ctx.scale(r, r)
-    } catch (e) {
-      // Do something when catch error
-    }
-    var monthIndex = 0
-    while(d < endDate){
-      var line = -1
-      var thisMonth = d.getMonth()
-      var posX = (monthIndex % 3) * 120 + 20 + paddingX
-      var posY = Math.floor(monthIndex / 3) * 105 + 10 + paddingY
-      ctx.setFontSize(12)
-      ctx.setFillStyle('#336699')
-      ctx.fillText((thisMonth + 1) + '月', posX + 3, posY + 7)
-
-      ctx.setFontSize(8)
-      ctx.setFillStyle('#333333')
-      while(d.getMonth() == thisMonth){
-        var wd = d.getDay()
-        if(line == -1){
-          line = 1
-        }else if(wd == 0){
-          line ++
-        }
-        var x = posX + wd * 15
-        var y = posY + line * 15 
-
-        var hasEvent = false;
-        for(var i=0; i<this.data.eventList.length; i++){
-          var ed = new Date(parseInt(this.data.eventList[i].d))
-          if(ed.getFullYear() == d.getFullYear() && ed.getMonth() == d.getMonth() && ed.getDate() == d.getDate()){
-            hasEvent = true
-            break;
-          }
-        }
-        
-        if(hasEvent){
-          ctx.beginPath()
-          ctx.setFillStyle('#FF0000')
-          ctx.arc(x, y + 2, 6, 0, 2 * Math.PI)
-          ctx.setFillStyle('#FF0000')
-          ctx.closePath()
-          ctx.fill()
-        }
-
-
-        //console.log('draw ' + d.getDate() + '/' + wd + ' at(' + x + "," + y + ")")
-        
-        ctx.beginPath()
-        if(hasEvent){
-          ctx.setFillStyle('#FFFFFF')
-        }else{
-          ctx.setFillStyle('#333333')
-        }
-        if(ctx.setTextAlign){
-          ctx.fillText('' + d.getDate(), x, y+5)
-        }else{
-          ctx.fillText('' + d.getDate(), x-1, y+5)
-        }
-        ctx.closePath()
-        ctx.fill()
-
-        d = new Date(d.getTime() + 24 * 3600 * 1000)
-      }
-      monthIndex ++
-    }
-
-    ctx.draw()
   },
   addEvent: function(){
     wx.navigateTo({
@@ -192,7 +120,7 @@ Page({
     this.setData({calendar:{year: now.getFullYear(), month: (now.getMonth() < 6 ? 0 : 6)}})
     this.initEventList()
     try{
-      this.drawCalendar(0, 0)
+      // this.drawCalendar(0, 0)
     }catch(ex){}
   },
   onPullDownRefresh: function () {
