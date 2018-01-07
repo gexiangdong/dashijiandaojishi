@@ -10,6 +10,7 @@
     <view class="iconlinks" wx:if="{{editable || deleteable}}">
         <view bindtap="editEvent" class="iconlink editicon" wx:if="{{editable}}">修改</view>
         <view bindtap="deleteEvent" class="iconlink deleteicon" wx:if="{{deleteable}}">删除</view>
+        <view bindtap="moreActions" wx:if="{{showMore}}" class="iconlink moreactions">.</view>
     </view>
     <view class="buttons">
         <button type="primary" size="default" 
@@ -21,5 +22,8 @@
     </view>
     <view class="notes">
     ＊下拉可切换名言
+    </view>
+    <view class="canvascontainer">
+    <canvas canvas-id="countdown" style="background-color:#FFFFFF; height:800px;width:800px;zoom:50%" />
     </view>
 </view>

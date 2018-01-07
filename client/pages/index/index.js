@@ -102,6 +102,13 @@ Page({
   },
   initEventList: function(){
     var myEvents = util.getMyEvents()
+    try{
+      myEvents.sort(function(e1, e2){
+        return e1.d - e2.d
+      })
+    }catch(ex){
+      // never happen if lucky
+    }
     var eventList = []
     for(var i=0; i<myEvents.length; i++){
       var event = {}

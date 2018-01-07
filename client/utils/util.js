@@ -76,7 +76,7 @@ function getMyEvents(){
           var sample0 = {
             name: '周末',
             d: new Date(d.getFullYear(), d.getMonth(), d.getDate() + (6 - d.getDay())).getTime(),
-            id: 'sample-zm-' + d.getTime
+            id: 'sample-zm-' + d.getTime()
           }
           myEvents.push(sample0)
         }
