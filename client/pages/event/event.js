@@ -202,10 +202,13 @@ Page({
         url: editUrl
     })
   },
-  saveEventImage: function(){
+  drawEventImage: function(){
     wx.showLoading({
       title: '制作中',
     })
+    var res = wx.getSystemInfoSync()
+    var platform = res.platform
+    var sdkversion = res.SDKVersion
 
     const ctx = wx.createCanvasContext('countdown')
     var left = 0
@@ -230,6 +233,9 @@ Page({
     for (var i = 0; i < t.length; i++){
       if(t.charAt(i) == '1'){
         dayWidth += 100
+        if (platform === 'android'){
+          dayWidth += 25
+        }
       }else{
         dayWidth += 140
       }
@@ -291,9 +297,22 @@ Page({
     ctx.setFillStyle('#CCCCCC')
     ctx.setTextAlign('right')
     ctx.fillText('本图由小程序『大事件倒计时』生成', 785, 785)
+    
+    if (sdkversion) {
+      sdkversion = sdkversion.substring(0, sdkversion.lastIndexOf('.'))
+      if (parseFloat(sdkversion) >= 1.7) {
+        //1.7以上draw支持完成后的callback
+        ctx.draw(false, this.saveEventImage)
+        return;
+      }
+    }
 
+    //因为draw()是直接返回，不知道是否已经画好图，所以等1秒后保存图
     ctx.draw()
-
+    setTimeout(this.saveEventImage, 1000)
+  },
+  
+  saveEventImage: function() {
     wx.canvasToTempFilePath({
       canvasId: 'countdown',
       success: function (res) {
@@ -346,7 +365,7 @@ Page({
           wx.authorize({
             scope: 'scope.writePhotosAlbum',
             success(res) {
-              that.saveEventImage()
+              that.drawEventImage()
             },
             fail() {
               wx.openSetting({
@@ -378,7 +397,7 @@ Page({
                 // 保存图片未授权，提示获取授权
                 that.askForWritePhotosAlbum()
               } else {
-                that.saveEventImage()
+                that.drawEventImage()
               }
             }
           })
