@@ -37,7 +37,7 @@ Page({
     var showDate = (eventName.length > 6 || eventDate.length > 6)
     
     var showMore = true
-    
+
     this.setData({
       event:{
             id: options.i,
@@ -61,7 +61,21 @@ Page({
     })
   },
   onReady:function(){
-    // 页面渲染完成
+    // 页面渲染完成，上报事件；
+    // 在此处不再onload里上报是为了加速事件显示
+    try {
+      var ps = getCurrentPages()
+      if (ps.length == 1) {
+        //第一页就是显示事件页面，表示从绘话点击分享进入
+        wx.reportAnalytics('view_event', {
+          event_name: this.data.event.name,
+          days_left: this.data.event.days
+        })
+        // console.log("上报完成。")
+      }
+    } catch (ex) {
+      console.error("上报事件时出错", ex)
+    }
   },
   onShow:function(){
     var myEvents = util.getMyEvents();
